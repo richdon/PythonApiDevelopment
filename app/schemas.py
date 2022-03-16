@@ -23,17 +23,16 @@ class Post(PostBase):
 
 class UserBase(BaseModel):
     email: EmailStr
-    password: str
 
     # Needed for Fast api to read orm models
     class Config:
         orm_mode = True
 
 
-class User(UserBase):
+class UserOut(UserBase):
     id: int
     created_at: datetime
 
 
 class UserCreate(UserBase):
-    pass
+    password: str
