@@ -8,3 +8,7 @@ app/__pycache__/
 *.txt
 
 routers/__pycache__/
+/venv/
+
+/venv/Include/
+/venv/Lib/
