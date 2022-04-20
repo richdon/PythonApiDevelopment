@@ -4,3 +4,7 @@ venv/
 app/__pycache__/
 
 .idea/
+
+*.txt
+
+routers/__pycache__/
