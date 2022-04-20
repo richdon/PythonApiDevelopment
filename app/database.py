@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-f = open('files/pw.txt', 'r')
+f = open('app/files/pw.txt', 'r')
 pw = f.read()
 f.close()
 
