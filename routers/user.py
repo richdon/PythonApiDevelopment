@@ -28,4 +28,3 @@ def get_user(id: int, db: Session = Depends(get_db)):
                             detail=f'user with id {id} was not found')
     return user
 
-
