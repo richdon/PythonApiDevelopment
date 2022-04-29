@@ -1,7 +1,7 @@
-from typing import List
-from app import models, schemes, utils, oauth2
+from typing import List, Optional
+from app import models, schemes, oauth2
 from sqlalchemy.orm import Session
-from fastapi import FastAPI, Response, status, HTTPException, Depends, APIRouter
+from fastapi import Response, status, HTTPException, Depends, APIRouter
 from app.database import get_db
 
 router = APIRouter(
@@ -12,8 +12,9 @@ router = APIRouter(
 
 
 @router.get('/', response_model=List[schemes.Post])
-def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    posts = db.query(models.Post).all()
+def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),
+              limit: int = 10, skip: int = 0, search: Optional[str] = ''):
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts
 
 
@@ -43,7 +44,7 @@ def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends
 
 
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
+def delete_post(id: int, db: Session = Depends(get_db), current_user= Depends(oauth2.get_current_user)):
 
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
@@ -60,7 +61,7 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depe
 
 @router.put('/{id}', response_model=schemes.Post)
 def update_post(id: int, post: schemes.PostCreate, db: Session = Depends(get_db),
-                current_user: int = Depends(oauth2.get_current_user)):
+                current_user= Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     my_post = post_query.first()
     if not my_post:
