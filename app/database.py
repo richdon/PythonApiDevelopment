@@ -1,12 +1,11 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from .config import settings
 
-f = open('app/files/pw.txt', 'r')
-pw = f.read()
-f.close()
-
-SQLAlCHEMY_DATABASE_URL = f'postgresql://postgres:{pw}@localhost/fast-api-social-media-app'
+SQLAlCHEMY_DATABASE_URL = f'postgresql://' \
+                          f'{settings.database_username}:{settings.database_password}@{settings.database_hostname}:' \
+                          f'{settings.database_port}/{settings.database_name}'
 
 engine = create_engine(SQLAlCHEMY_DATABASE_URL)
 
