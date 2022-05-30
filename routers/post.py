@@ -1,5 +1,6 @@
 from typing import List, Optional
 from app import models, schemes, oauth2
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from fastapi import Response, status, HTTPException, Depends, APIRouter
 from app.database import get_db
@@ -11,10 +12,18 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model=List[schemes.Post])
+@router.get('/', response_model=List[schemes.PostOut])
 def get_posts(db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user),
               limit: int = 10, skip: int = 0, search: Optional[str] = ''):
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    posts = db.query(
+        models.Post,
+        func.count(models.Vote.post_id).label('votes')).join(
+        models.Vote,
+        models.Vote.post_id == models.Post.id,
+        isouter=True).group_by(
+            models.Post.id).filter(
+                    models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts
 
 
@@ -33,9 +42,16 @@ def create_posts(post: schemes.PostCreate, db: Session = Depends(get_db),
     return new_post_query
 
 
-@router.get('/{id}', response_model=schemes.Post)
+@router.get('/{id}', response_model=schemes.PostOut)
 def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    query = db.query(models.Post).filter(models.Post.id == id)
+    # query = db.query(models.Post).filter(models.Post.id == id)
+    query = db.query(
+        models.Post,
+        func.count(models.Vote.post_id).label('votes')).join(
+        models.Vote,
+        models.Vote.post_id == models.Post.id,
+        isouter=True).group_by(
+        models.Post.id).filter(models.Post.id == id)
     post = query.first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -44,8 +60,7 @@ def get_post(id: int, db: Session = Depends(get_db), current_user: int = Depends
 
 
 @router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), current_user= Depends(oauth2.get_current_user)):
-
+def delete_post(id: int, db: Session = Depends(get_db), current_user=Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
     if not post:
@@ -61,7 +76,7 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user= Depends(oa
 
 @router.put('/{id}', response_model=schemes.Post)
 def update_post(id: int, post: schemes.PostCreate, db: Session = Depends(get_db),
-                current_user= Depends(oauth2.get_current_user)):
+                current_user=Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == id)
     my_post = post_query.first()
     if not my_post:
