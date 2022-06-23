@@ -6,9 +6,11 @@ app/__pycache__/
 .idea/
 
 *.txt
-
+.env
 routers/__pycache__/
 /venv/
 
 /venv/Include/
 /venv/Lib/
+
+alembic/versions/__pycache__/

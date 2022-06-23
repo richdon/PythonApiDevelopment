@@ -30,3 +30,5 @@ class Vote(Base):
     __tablename__ = 'votes'
     user_id = Column(Integer, ForeignKey('users.id', ondelete='CASCADE'), primary_key=True, nullable=False)
     post_id = Column(Integer, ForeignKey('posts.id', ondelete='CASCADE'), primary_key=True, nullable=False)
+    # Tells sql alchemy to fetch piece of info based on relationship. returns class of another model
+    owner = relationship('User')
