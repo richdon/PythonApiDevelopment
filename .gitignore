@@ -5,7 +5,6 @@ app/__pycache__/
 
 .idea/
 
-*.txt
 .env
 routers/__pycache__/
 /venv/
@@ -14,3 +13,4 @@ routers/__pycache__/
 /venv/Lib/
 
 alembic/versions/__pycache__/
+__pycache__
