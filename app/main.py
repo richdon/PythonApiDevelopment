@@ -1,12 +1,23 @@
 from fastapi import FastAPI
 from .database import engine
 from . import models
+from fastapi.middleware.cors import CORSMiddleware
 from routers import post, user, auth, vote
 from .config import settings
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # allows path operations to be in different modules, by grabbing router object from post and user files
 app.include_router(post.router)
